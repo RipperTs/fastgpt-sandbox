@@ -63,6 +63,9 @@ docker run -e PYTHON_ENABLE_SECCOMP=0 -e PY_SANDBOX_TIMEOUT=60 -p 3000:3000 your
 docker run -e PY_STRICT_STDERR=0 -p 3000:3000 your-image
 ```
 
+### 支持的 Python 依赖
+- 查看 [requirements.txt](requirements.txt)   
+
 ## Test
 
 ```bash
