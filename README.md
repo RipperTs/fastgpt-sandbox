@@ -45,6 +45,17 @@ $ pnpm run start:dev
 $ pnpm run start:prod
 ```
 
+### Sandbox 环境变量
+
+- `PY_SANDBOX_TIMEOUT`：Python 子进程超时时间（秒），默认 `30`。
+- `PYTHON_ENABLE_SECCOMP`：是否启用 Python seccomp 沙箱，`1` 启用（默认），`0` 关闭。
+
+示例（Docker 运行时关闭 seccomp 并放宽超时）：
+
+```bash
+docker run -e PYTHON_ENABLE_SECCOMP=0 -e PY_SANDBOX_TIMEOUT=60 -p 3000:3000 your-image
+```
+
 ## Test
 
 ```bash

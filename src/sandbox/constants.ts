@@ -24,7 +24,8 @@ import platform
 import sys
 
 # Skip seccomp on macOS since it's Linux-specific
-if platform.system() == 'Linux':
+enable_seccomp = os.environ.get('PYTHON_ENABLE_SECCOMP', '1')
+if platform.system() == 'Linux' and enable_seccomp == '1':
     try:
         from seccomp import *
         import errno
@@ -253,7 +254,9 @@ def run_pythonCode(data:dict):
     with open(tmp_file, "w", encoding="utf-8") as f:
         f.write(code)
     try:
-        result = subprocess.run(["python3", tmp_file], capture_output=True, text=True, timeout=10)
+        # Allow adjusting timeout via env, default 30s
+        timeout_sec = int(os.environ.get("PY_SANDBOX_TIMEOUT", "30"))
+        result = subprocess.run(["python3", tmp_file], capture_output=True, text=True, timeout=timeout_sec)
         if result.returncode == -31:
             return {"error": "Dangerous behavior detected (likely file write attempt)."}
         if result.stderr != "":
