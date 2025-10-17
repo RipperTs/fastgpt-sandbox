@@ -1,13 +1,13 @@
 # --------- Python Base（安装依赖） -----------
 FROM python:3.11-alpine AS python_base
-# 安装构建依赖与 libseccomp 开发包
+# 安装构建依赖与 libseccomp 开发包（使用官方源，移除镜像代理配置）
 RUN apk add --no-cache make g++ tar wget gperf automake libtool linux-headers libseccomp-dev
 
 WORKDIR /app
 # 复制当前根目录的 requirements.txt（原来的 projects/sandbox/requirements.txt）
 COPY requirements.txt /app/requirements.txt
 
-# 先安装 Cython 和其他 Python 依赖
+# 先安装 Cython 和其他 Python 依赖（使用默认 PyPI 源）
 RUN pip install --no-cache-dir Cython && \
     pip install --no-cache-dir -r /app/requirements.txt
 
@@ -29,7 +29,6 @@ RUN wget https://github.com/seccomp/libseccomp/releases/download/v2.5.5/libsecco
 FROM node:20.14.0-alpine AS builder
 
 WORKDIR /app
-
 # 构建原生模块需要
 RUN apk add --no-cache make g++ python3
 
