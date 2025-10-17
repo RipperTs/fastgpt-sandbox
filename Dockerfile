@@ -1,16 +1,17 @@
-# --------- install dependence -----------
+# --------- Python Base（安装依赖） -----------
 FROM python:3.11-alpine AS python_base
-# 安装make和g++以及libseccomp开发包
+# 安装构建依赖与 libseccomp 开发包
 RUN apk add --no-cache make g++ tar wget gperf automake libtool linux-headers libseccomp-dev
 
 WORKDIR /app
-COPY projects/sandbox/requirements.txt /app/requirements.txt
+# 复制当前根目录的 requirements.txt（原来的 projects/sandbox/requirements.txt）
+COPY requirements.txt /app/requirements.txt
 
-# 先安装Cython和其他Python依赖
+# 先安装 Cython 和其他 Python 依赖
 RUN pip install --no-cache-dir -i https://mirrors.aliyun.com/pypi/simple Cython && \
     pip install --no-cache-dir -i https://mirrors.aliyun.com/pypi/simple -r /app/requirements.txt
 
-# 下载、编译并安装libseccomp及其Python绑定
+# 下载并安装 libseccomp 及其 Python 绑定
 ENV VERSION_RELEASE=2.5.5
 RUN wget https://github.com/seccomp/libseccomp/releases/download/v2.5.5/libseccomp-2.5.5.tar.gz && \
     tar -zxvf libseccomp-2.5.5.tar.gz && \
@@ -24,50 +25,48 @@ RUN wget https://github.com/seccomp/libseccomp/releases/download/v2.5.5/libsecco
     rm -rf libseccomp-2.5.5 libseccomp-2.5.5.tar.gz
 
 
-FROM node:20.14.0-alpine AS install
+# --------- Builder（构建 Node 项目） -----------
+FROM node:20.14.0-alpine AS builder
 
 WORKDIR /app
 
 ARG proxy
 RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+# 构建原生模块需要
 RUN apk add --no-cache make g++ python3
 
-# copy py3.11
+# 提供 python 环境（如需）
 COPY --from=python_base /usr/local /usr/local
 
-RUN npm install -g pnpm@9.4.0
-RUN [ -z "$proxy" ] || pnpm config set registry https://registry.npmmirror.com
+# 仅复制依赖清单以利用缓存
+COPY package.json ./
+COPY package-lock.json* ./
+RUN npm install
 
-COPY pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY ./projects/sandbox/package.json ./projects/sandbox/package.json
+# 复制源码
+COPY . .
 
-RUN [ -f pnpm-lock.yaml ] || (echo "Lockfile not found." && exit 1)
+# 构建（原来的 pnpm --filter=sandbox build）
+RUN npm run build
 
-RUN pnpm i
 
-# --------- builder -----------
-FROM node:20.14.0-alpine AS builder
-
-WORKDIR /app
-
-COPY package.json pnpm-workspace.yaml /app/
-COPY --from=install /app/node_modules /app/node_modules
-COPY ./projects/sandbox /app/projects/sandbox
-COPY --from=install /app/projects/sandbox /app/projects/sandbox
-
-RUN npm install -g pnpm@9.4.0
-RUN pnpm --filter=sandbox build
-
-# --------- runner -----------
+# --------- Runner（运行时） -----------
 FROM node:20.14.0-alpine AS runner
 WORKDIR /app
 
 RUN apk add --no-cache libffi libffi-dev strace bash
 COPY --from=python_base /usr/local /usr/local
-COPY --from=builder /app/node_modules /app/node_modules
-COPY --from=builder /app/projects/sandbox /app/projects/sandbox
+
+# 仅复制生产所需内容
+COPY package.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
 
 ENV NODE_ENV=production
 ENV PATH="/usr/local/bin:${PATH}"
 
-CMD ["node", "--no-node-snapshot", "projects/sandbox/dist/main.js"]
+# 去除开发依赖以减小体积
+RUN npm prune --omit=dev
+
+# 原来的 projects/sandbox/dist/main.js 改为根目录 dist/main.js
+CMD ["node", "--no-node-snapshot", "dist/main.js"]
