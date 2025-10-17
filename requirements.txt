@@ -2,7 +2,7 @@ numpy
 pandas
 jionlp==1.5.4
 jiojio==1.2.5
-requests==2.31.0
+requests>=2.32.5,<3.0.0
 urllib3==1.26.15
 sqlglot
 langchain-community==0.3.30
