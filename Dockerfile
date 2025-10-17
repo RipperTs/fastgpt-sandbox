@@ -8,8 +8,8 @@ WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 
 # 先安装 Cython 和其他 Python 依赖
-RUN pip install --no-cache-dir -i https://mirrors.aliyun.com/pypi/simple Cython && \
-    pip install --no-cache-dir -i https://mirrors.aliyun.com/pypi/simple -r /app/requirements.txt
+RUN pip install --no-cache-dir Cython && \
+    pip install --no-cache-dir -r /app/requirements.txt
 
 # 下载并安装 libseccomp 及其 Python 绑定
 ENV VERSION_RELEASE=2.5.5
@@ -30,8 +30,6 @@ FROM node:20.14.0-alpine AS builder
 
 WORKDIR /app
 
-ARG proxy
-RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 # 构建原生模块需要
 RUN apk add --no-cache make g++ python3
 
