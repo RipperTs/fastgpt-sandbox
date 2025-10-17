@@ -1,0 +1,6 @@
+numpy
+pandas
+jionlp==1.5.4
+jiojio==1.2.5
+requests==2.31.0
+urllib3==1.26.15
