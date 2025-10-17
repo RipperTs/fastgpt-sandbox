@@ -49,11 +49,18 @@ $ pnpm run start:prod
 
 - `PY_SANDBOX_TIMEOUT`：Python 子进程超时时间（秒），默认 `30`。
 - `PYTHON_ENABLE_SECCOMP`：是否启用 Python seccomp 沙箱，`1` 启用（默认），`0` 关闭。
+- `PY_STRICT_STDERR`：是否将子进程 `stderr` 视为失败。`0` 忽略告警（默认），`1` 视为失败。
 
 示例（Docker 运行时关闭 seccomp 并放宽超时）：
 
 ```bash
 docker run -e PYTHON_ENABLE_SECCOMP=0 -e PY_SANDBOX_TIMEOUT=60 -p 3000:3000 your-image
+```
+
+仅放行 `stderr` 告警：
+
+```bash
+docker run -e PY_STRICT_STDERR=0 -p 3000:3000 your-image
 ```
 
 ## Test

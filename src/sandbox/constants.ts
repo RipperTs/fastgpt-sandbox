@@ -22,6 +22,7 @@ def extract_imports(code):
 seccomp_prefix = """
 import platform
 import sys
+import os
 
 # Skip seccomp on macOS since it's Linux-specific
 enable_seccomp = os.environ.get('PYTHON_ENABLE_SECCOMP', '1')
@@ -256,10 +257,13 @@ def run_pythonCode(data:dict):
     try:
         # Allow adjusting timeout via env, default 30s
         timeout_sec = int(os.environ.get("PY_SANDBOX_TIMEOUT", "30"))
+        strict_stderr = os.environ.get("PY_STRICT_STDERR", "0") == "1"
         result = subprocess.run(["python3", tmp_file], capture_output=True, text=True, timeout=timeout_sec)
         if result.returncode == -31:
             return {"error": "Dangerous behavior detected (likely file write attempt)."}
-        if result.stderr != "":
+        if result.returncode != 0:
+            return {"error": result.stderr or f"Process exited with code {result.returncode}"}
+        if strict_stderr and result.stderr and result.stderr.strip():
             return {"error": result.stderr}
 
         out = ast.literal_eval(result.stdout.strip())
