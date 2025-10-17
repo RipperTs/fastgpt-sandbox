@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 
 # 先安装 Cython 和其他 Python 依赖（使用默认 PyPI 源）
-RUN pip install --no-cache-dir Cython && \
+RUN pip install --no-cache-dir -i https://mirrors.aliyun.com/pypi/simple Cython && \
     pip install --no-cache-dir -r /app/requirements.txt
 
 # 下载并安装 libseccomp 及其 Python 绑定
