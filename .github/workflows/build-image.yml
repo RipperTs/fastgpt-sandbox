@@ -12,6 +12,7 @@ on:
       - '**/*.txt'
       - '*.jpg'
       - '*.jpeg'
+      - 'docker-compose.yml'
       - '*.png'
       - '*.gif'
       - '*.svg'

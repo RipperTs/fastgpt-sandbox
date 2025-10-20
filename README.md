@@ -32,6 +32,60 @@
 $ pnpm install
 ```
 
+## Docker 镜像
+
+已打包可用的 Docker 镜像（可直接拉取运行）：
+
+```
+registry.cn-hangzhou.aliyuncs.com/ripper/fastgpt-sandbox:latest
+```
+
+快速使用：
+
+```bash
+# 拉取镜像
+docker pull registry.cn-hangzhou.aliyuncs.com/ripper/fastgpt-sandbox:latest
+
+# 运行（默认暴露 3000 端口）
+docker run -d --name fastgpt-sandbox -p 3000:3000 \
+  registry.cn-hangzhou.aliyuncs.com/ripper/fastgpt-sandbox:latest
+```
+
+## Docker Compose 使用
+
+项目已提供 `docker-compose.yml`，可一键启动服务。
+
+```bash
+# 后台启动
+docker compose up -d
+
+# 查看服务状态
+docker compose ps
+
+# 查看日志
+docker compose logs -f sandbox
+
+# 更新镜像并重启
+docker compose pull && docker compose up -d
+
+# 停止并移除容器
+docker compose down
+```
+
+默认映射端口：`3000->3000`，启动后访问：`http://localhost:3000/api`。
+
+如需调整运行参数，编辑 `docker-compose.yml` 的 `environment` 段，例如：
+
+```yaml
+services:
+  sandbox:
+    environment:
+      - PY_SANDBOX_TIMEOUT=60
+      - PYTHON_ENABLE_SECCOMP=0
+      # 可选：仅放行 stderr 告警
+      # - PY_STRICT_STDERR=0
+```
+
 ## Running the app
 
 ```bash
@@ -51,16 +105,18 @@ $ pnpm run start:prod
 - `PYTHON_ENABLE_SECCOMP`：是否启用 Python seccomp 沙箱，`1` 启用（默认），`0` 关闭。
 - `PY_STRICT_STDERR`：是否将子进程 `stderr` 视为失败。`0` 忽略告警（默认），`1` 视为失败。
 
-示例（Docker 运行时关闭 seccomp 并放宽超时）：
+示例（Docker 使用官方镜像，关闭 seccomp 并放宽超时）：
 
 ```bash
-docker run -e PYTHON_ENABLE_SECCOMP=0 -e PY_SANDBOX_TIMEOUT=60 -p 3000:3000 your-image
+docker run -e PYTHON_ENABLE_SECCOMP=0 -e PY_SANDBOX_TIMEOUT=60 -p 3000:3000 \
+  registry.cn-hangzhou.aliyuncs.com/ripper/fastgpt-sandbox:latest
 ```
 
 仅放行 `stderr` 告警：
 
 ```bash
-docker run -e PY_STRICT_STDERR=0 -p 3000:3000 your-image
+docker run -e PY_STRICT_STDERR=0 -p 3000:3000 \
+  registry.cn-hangzhou.aliyuncs.com/ripper/fastgpt-sandbox:latest
 ```
 
 ### 支持的 Python 依赖

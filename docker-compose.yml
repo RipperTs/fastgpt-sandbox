@@ -1,0 +1,11 @@
+version: '3.3'
+services:
+  sandbox:
+    container_name: sandbox
+    image: registry.cn-hangzhou.aliyuncs.com/ripper/fastgpt-sandbox:latest
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      - PY_SANDBOX_TIMEOUT=60
+      - PYTHON_ENABLE_SECCOMP=0
