@@ -7,3 +7,6 @@ urllib3==1.26.15
 sqlglot
 langchain-community==0.3.30
 passlib
+pymysql
+psycopg2-binary
+clickhouse-sqlalchemy
