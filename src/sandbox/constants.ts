@@ -165,7 +165,7 @@ def detect_file_write_operations(code):
     dangerous_patterns = [
         'open(', 'file(', 'write(', 'writelines(',
         'with open', 'f.write', '.write(', 
-        'create', 'mkdir', 'makedirs'
+        'os.mkdir(', 'os.makedirs('
     ]
     
     for pattern in dangerous_patterns:
