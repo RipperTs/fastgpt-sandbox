@@ -8,8 +8,6 @@ on:
     paths-ignore:
       - '*.md'
       - '**/*.md'
-      - '*.txt'
-      - '**/*.txt'
       - '*.jpg'
       - '*.jpeg'
       - 'docker-compose.yml'
