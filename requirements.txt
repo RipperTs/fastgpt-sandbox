@@ -10,3 +10,4 @@ passlib
 pymysql
 psycopg2-binary
 clickhouse-sqlalchemy
+oracledb

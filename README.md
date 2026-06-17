@@ -121,6 +121,7 @@ docker run -e PY_STRICT_STDERR=0 -p 3000:3000 \
 
 ### 支持的 Python 依赖
 - 查看 [requirements.txt](requirements.txt)   
+- 数据库 schema 读取已包含 MySQL、PostgreSQL、ClickHouse、Oracle 常用驱动，其中 Oracle 使用 `oracledb`。
 
 ## Test
 

@@ -102,6 +102,20 @@ if platform.system() == 'Linux' and enable_seccomp == '1':
             "syscall.SYS_GETCWD",
             "syscall.SYS_READLINK",
             "syscall.SYS_READLINKAT",
+
+            # Network operations for database drivers such as PyMySQL,
+            # psycopg2, clickhouse-sqlalchemy and python-oracledb.
+            "syscall.SYS_SOCKET",
+            "syscall.SYS_CONNECT",
+            "syscall.SYS_SENDTO",
+            "syscall.SYS_RECVFROM",
+            "syscall.SYS_SENDMSG",
+            "syscall.SYS_RECVMSG",
+            "syscall.SYS_SHUTDOWN",
+            "syscall.SYS_SETSOCKOPT",
+            "syscall.SYS_GETSOCKOPT",
+            "syscall.SYS_GETSOCKNAME",
+            "syscall.SYS_GETPEERNAME",
         ]
         allowed_syscalls_tmp = allowed_syscalls
         L = []
